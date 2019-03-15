@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 #include "gdns.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,6 +37,7 @@ const godot_gdnative_ext_nativescript_api_struct *nativescript_api = NULL;
 // | |_| |/ _ \ | '_ \ / _ \ '__| |_ | | | | '_ \ / __/ __|
 // |  _  |  __/ | |_) |  __/ |  |  _|| |_| | | | | (__\__ \
 // |_| |_|\___|_| .__/ \___|_|  |_|   \__,_|_| |_|\___|___/
+//              |_|
 
 void gdns_print(const char *p_message) {
 	godot_string s;
@@ -49,11 +51,11 @@ void gdns_print(const char *p_message) {
 char *gdns_cstr_new_string(godot_string *p_string) {
 	godot_char_string char_str;
 
-	char_str = godot_string_utf8(p_string);
-	const char *cstr = godot_char_string_get_data(&char_str);
-	godot_char_string_destroy(&char_str);
+	char_str = api->godot_string_utf8(p_string);
+	const char *cstr = api->godot_char_string_get_data(&char_str);
+	api->godot_char_string_destroy(&char_str);
 
-	char *ret = malloc(strlen(cstr + 1));
+	char *ret = malloc(strlen(cstr));
 	strcpy(ret, cstr);
 
 	return ret;
@@ -83,4 +85,42 @@ godot_variant gdns_variant_new_cstr(const char *p_cstr) {
 	api->godot_string_destroy(&s);
 
 	return ret;
+}
+
+godot_variant *gdns_variant_new_int(int p_value) {
+	godot_variant *ret;
+
+	ret = api->godot_alloc(GODOT_VARIANT_SIZE);
+	api->godot_variant_new_int(ret, p_value);
+
+	return ret;
+}
+
+godot_dictionary *gdns_dictionary_new() {
+	godot_dictionary *dict;
+
+	dict = api->godot_alloc(GODOT_DICTIONARY_SIZE);
+	api->godot_dictionary_new(dict);
+
+	return dict;
+}
+
+void gdns_dictionary_destroy(godot_dictionary *p_dict) {
+	api->godot_dictionary_destroy(p_dict);
+	api->godot_free(p_dict);
+}
+
+void gdns_dictionary_set_int(godot_dictionary *p_dict, const char *p_key, int p_value) {
+	godot_variant key;
+	godot_variant *value;
+
+	key = gdns_variant_new_cstr(p_key);
+	value = gdns_variant_new_int(p_value);
+
+	api->godot_dictionary_set(p_dict, &key, value);
+	api->godot_free(value);
+}
+
+void gdns_free(void *ptr) {
+	api->godot_free(ptr);
 }

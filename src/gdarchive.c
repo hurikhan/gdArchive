@@ -84,47 +84,20 @@ godot_variant gdarchive_get_version_details_string(GDNS_PARAM) {
 }
 
 godot_variant gdarchive_get_version_dict(GDNS_PARAM) {
-
-	godot_dictionary dict;
-	godot_variant key;
-	godot_variant value;
 	godot_variant ret;
-
-	godot_string s;
+	godot_dictionary *dict;
 
 	int major = archive_version_number() / 1000000;
 	int minor = (archive_version_number() / 1000) % 1000;
 	int patch = archive_version_number() % 1000;
 
-	api->godot_dictionary_new(&dict);
-	api->godot_string_new(&s);
+	dict = gdns_dictionary_new();
+	gdns_dictionary_set_int(dict, "major", major);
+	gdns_dictionary_set_int(dict, "minor", minor);
+	gdns_dictionary_set_int(dict, "patch", patch);
 
-	api->godot_string_parse_utf8(&s, "major");
-	api->godot_variant_new_string(&key, &s);
-	api->godot_variant_new_int(&value, major);
-	api->godot_dictionary_set(&dict, &key, &value);
-	api->godot_variant_destroy(&key);
-	api->godot_variant_destroy(&value);
-
-	api->godot_string_parse_utf8(&s, "minor");
-	api->godot_variant_new_string(&key, &s);
-	api->godot_variant_new_int(&value, minor);
-	api->godot_dictionary_set(&dict, &key, &value);
-	api->godot_variant_destroy(&key);
-	api->godot_variant_destroy(&value);
-
-	api->godot_string_parse_utf8(&s, "patch");
-	api->godot_variant_new_string(&key, &s);
-	api->godot_variant_new_int(&value, patch);
-	api->godot_dictionary_set(&dict, &key, &value);
-	api->godot_variant_destroy(&key);
-	api->godot_variant_destroy(&value);
-
-	api->godot_variant_new_dictionary(&ret, &dict);
-
-	api->godot_string_destroy(&s);
-	api->godot_dictionary_destroy(&dict);
-
+	api->godot_variant_new_dictionary(&ret, dict);
+	gdns_dictionary_destroy(dict);
 	return ret;
 }
 
@@ -153,7 +126,7 @@ godot_variant gdarchive_list_files(GDNS_PARAM) {
 
 		size_t user_path_len = strlen(user_path);
 		size_t arg0_len = strlen(arg0);
-		memcpy(filename + user_path_len, arg0 + 7 - 1, arg0_len - 7 + 1);
+		memcpy(filename + user_path_len, arg0 + 7 - 1, arg0_len - 7 + 2);
 
 		godot_string_destroy(&path);
 		free(user_path);
