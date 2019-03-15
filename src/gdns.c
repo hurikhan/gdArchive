@@ -37,7 +37,16 @@ const godot_gdnative_ext_nativescript_api_struct *nativescript_api = NULL;
 // |  _  |  __/ | |_) |  __/ |  |  _|| |_| | | | | (__\__ \
 // |_| |_|\___|_| .__/ \___|_|  |_|   \__,_|_| |_|\___|___/
 
-char *gdns_get_string_cstr(godot_string *p_string) {
+void gdns_print(const char *p_message) {
+	godot_string s;
+
+	api->godot_string_new(&s);
+	api->godot_string_parse_utf8(&s, p_message);
+	api->godot_print(&s);
+	api->godot_string_destroy(&s);
+}
+
+char *gdns_cstr_new_string(godot_string *p_string) {
 	godot_char_string char_str;
 
 	char_str = godot_string_utf8(p_string);
@@ -50,11 +59,11 @@ char *gdns_get_string_cstr(godot_string *p_string) {
 	return ret;
 }
 
-char *gdns_get_variant_cstr(godot_variant *p_variant) {
+char *gdns_cstr_new_variant(godot_variant *p_variant) {
 	godot_string str;
 
 	str = godot_variant_as_string(p_variant);
-	char *cstr = gdns_get_string_cstr(&str);
+	char *cstr = gdns_cstr_new_string(&str);
 	godot_string_destroy(&str);
 
 	char *ret = malloc(strlen(cstr + 1));
@@ -64,11 +73,14 @@ char *gdns_get_variant_cstr(godot_variant *p_variant) {
 	return ret;
 }
 
-void gdns_print(const char *p_message) {
+godot_variant gdns_variant_new_cstr(const char *p_cstr) {
 	godot_string s;
+	godot_variant ret;
 
 	api->godot_string_new(&s);
-	api->godot_string_parse_utf8(&s, p_message);
-	api->godot_print(&s);
+	api->godot_string_parse_utf8(&s, p_cstr);
+	api->godot_variant_new_string(&ret, &s);
 	api->godot_string_destroy(&s);
+
+	return ret;
 }

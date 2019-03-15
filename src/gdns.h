@@ -68,8 +68,10 @@ extern const godot_gdnative_ext_nativescript_api_struct *nativescript_api;
 // |_|   |_|  \___/ \__\___/ \__|\__, | .__/ \___||___/
 //                               |___/|_|
 
-char *gdns_get_string_cstr(godot_string *p_string);
-char *gdns_get_variant_cstr(godot_variant *p_variant);
 void gdns_print(const char *p_message);
+
+char *gdns_cstr_new_string(godot_string *p_string);
+char *gdns_cstr_new_variant(godot_variant *p_variant);
+godot_variant gdns_variant_new_cstr(const char *p_cstr);
 
 #endif

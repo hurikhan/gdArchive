@@ -69,15 +69,16 @@ void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM) {
 
 godot_variant gdarchive_get_version_string(GDNS_PARAM) {
 
-	godot_string s;
-	godot_variant ret;
-
 	const char *version = archive_version_string();
+	godot_variant ret = gdns_variant_new_cstr(version);
 
-	api->godot_string_new(&s);
-	api->godot_string_parse_utf8(&s, version);
-	api->godot_variant_new_string(&ret, &s);
-	api->godot_string_destroy(&s);
+	return ret;
+}
+
+godot_variant gdarchive_get_version_details_string(GDNS_PARAM) {
+
+	const char *version_details = archive_version_details();
+	godot_variant ret = gdns_variant_new_cstr(version_details);
 
 	return ret;
 }
@@ -127,28 +128,13 @@ godot_variant gdarchive_get_version_dict(GDNS_PARAM) {
 	return ret;
 }
 
-godot_variant gdarchive_get_version_details_string(GDNS_PARAM) {
-
-	godot_string s;
-	godot_variant ret;
-
-	const char *version_details = archive_version_details();
-
-	api->godot_string_new(&s);
-	api->godot_string_parse_utf8(&s, version_details);
-	api->godot_variant_new_string(&ret, &s);
-	api->godot_string_destroy(&s);
-
-	return ret;
-}
-
 godot_variant gdarchive_list_files(GDNS_PARAM) {
 
 	// TODO: dynamic allocation of char array filename
 	char filename[1024];
 	memset(filename, 0, 1024);
 
-	char *arg0 = gdns_get_variant_cstr(p_args[0]);
+	char *arg0 = gdns_cstr_new_variant(p_args[0]);
 
 	if (memcmp(arg0, "user://", 7) == 0) {
 		godot_object *os;
@@ -162,7 +148,7 @@ godot_variant gdarchive_list_files(GDNS_PARAM) {
 		const void *args[1] = {};
 		api->godot_method_bind_ptrcall(mb, os, args, &path);
 
-		char *user_path = gdns_get_string_cstr(&path);
+		char *user_path = gdns_cstr_new_string(&path);
 		strcat(filename, user_path);
 
 		size_t user_path_len = strlen(user_path);
