@@ -63,3 +63,12 @@ char *gdns_get_variant_cstr(godot_variant *p_variant) {
 
 	return ret;
 }
+
+void gdns_print(const char *p_message) {
+	godot_string s;
+
+	api->godot_string_new(&s);
+	api->godot_string_parse_utf8(&s, p_message);
+	api->godot_print(&s);
+	api->godot_string_destroy(&s);
+}

@@ -70,5 +70,6 @@ extern const godot_gdnative_ext_nativescript_api_struct *nativescript_api;
 
 char *gdns_get_string_cstr(godot_string *p_string);
 char *gdns_get_variant_cstr(godot_variant *p_variant);
+void gdns_print(const char *p_message);
 
 #endif
