@@ -1,0 +1,8 @@
+[repo-update]
+name=CN-Update
+enabled=1
+autorefresh=1
+baseurl=https://mirrors.shu.edu.cn/opensuse/update/openSUSE-current/
+path=/
+type=rpm-md
+keeppackages=0

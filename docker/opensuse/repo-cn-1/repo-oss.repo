@@ -1,0 +1,8 @@
+[repo-oss]
+name=CN-Oss
+enabled=1
+autorefresh=1
+baseurl=http://mirrors.tuna.tsinghua.edu.cn/opensuse/distribution/openSUSE-current/repo/oss/
+path=/
+type=rpm-md
+keeppackages=0

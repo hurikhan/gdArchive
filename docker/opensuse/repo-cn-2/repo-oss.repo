@@ -1,0 +1,8 @@
+[repo-oss]
+name=CN-Oss
+enabled=1
+autorefresh=1
+baseurl=https://mirrors.shu.edu.cn/opensuse/distribution/leap/15.0/repo/oss/
+path=/
+type=rpm-md
+keeppackages=0
