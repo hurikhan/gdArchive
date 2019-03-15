@@ -5,6 +5,9 @@ then
 	git clone https://github.com/GodotNativeTools/godot_headers.git
 fi
 
+clang-format -i --style=file *.h
+clang-format -i --style=file *.c
+
 mkdir -p bin
 clang -std=c11 -fPIC -c -g -I godot_headers gdns.c -o bin/gdns.os && \
 clang -std=c11 -fPIC -c -g -I godot_headers gdarchive.c -o bin/gdarchive.os && \

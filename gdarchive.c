@@ -1,15 +1,15 @@
 // Copyright (c) 2019 Mario Schlack
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,34 +18,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 #include "gdns.h"
+#include <archive.h>
+#include <archive_entry.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <archive.h>
-#include <archive_entry.h>
 
-
-//  ____            _        _                         
-// |  _ \ _ __ ___ | |_ ___ | |_ _   _ _ __   ___  ___ 
+//  ____            _        _
+// |  _ \ _ __ ___ | |_ ___ | |_ _   _ _ __   ___  ___
 // | |_) | '__/ _ \| __/ _ \| __| | | | '_ \ / _ \/ __|
 // |  __/| | | (_) | || (_) | |_| |_| | |_) |  __/\__ \
 // |_|   |_|  \___/ \__\___/ \__|\__, | .__/ \___||___/
-//                               |___/|_|  
+//                               |___/|_|
 
-void *gdarchive_constructor( GDNS_CONSTRUCTOR_PARAM );
-void gdarchive_destructor( GDNS_DESTRUCTOR_PARAM );
+void *gdarchive_constructor(GDNS_CONSTRUCTOR_PARAM);
+void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM);
 
-godot_variant gdarchive_get_version_string( GDNS_PARAM );
-godot_variant gdarchive_get_version_dict( GDNS_PARAM );
-godot_variant gdarchive_get_version_details_string( GDNS_PARAM );
-godot_variant gdarchive_list_files( GDNS_PARAM );
+godot_variant gdarchive_get_version_string(GDNS_PARAM);
+godot_variant gdarchive_get_version_dict(GDNS_PARAM);
+godot_variant gdarchive_get_version_details_string(GDNS_PARAM);
+godot_variant gdarchive_list_files(GDNS_PARAM);
 
-
-
-//   ____ _               
-//  / ___| | __ _ ___ ___ 
+//   ____ _
+//  / ___| | __ _ ___ ___
 // | |   | |/ _` / __/ __|
 // | |___| | (_| \__ \__ \
 //  \____|_|\__,_|___/___/
@@ -54,27 +50,24 @@ typedef struct user_data_struct {
 	char data[256];
 } user_data_struct;
 
-
-void *gdarchive_constructor( GDNS_CONSTRUCTOR_PARAM ) {
+void *gdarchive_constructor(GDNS_CONSTRUCTOR_PARAM) {
 	user_data_struct *user_data = api->godot_alloc(sizeof(user_data_struct));
 	strcpy(user_data->data, "World from GDNative!");
 
 	return user_data;
 }
 
-
-void gdarchive_destructor( GDNS_DESTRUCTOR_PARAM ) {
-    api->godot_free(p_user_data);
+void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM) {
+	api->godot_free(p_user_data);
 }
 
-
-//  __  __      _   _               _     
-// |  \/  | ___| |_| |__   ___   __| |___ 
+//  __  __      _   _               _
+// |  \/  | ___| |_| |__   ___   __| |___
 // | |\/| |/ _ \ __| '_ \ / _ \ / _` / __|
 // | |  | |  __/ |_| | | | (_) | (_| \__ \
 // |_|  |_|\___|\__|_| |_|\___/ \__,_|___/
 
-godot_variant gdarchive_get_version_string( GDNS_PARAM ) {
+godot_variant gdarchive_get_version_string(GDNS_PARAM) {
 
 	godot_string s;
 	godot_variant ret;
@@ -89,7 +82,7 @@ godot_variant gdarchive_get_version_string( GDNS_PARAM ) {
 	return ret;
 }
 
-godot_variant gdarchive_get_version_dict( GDNS_PARAM ) {
+godot_variant gdarchive_get_version_dict(GDNS_PARAM) {
 
 	godot_dictionary dict;
 	godot_variant key;
@@ -112,7 +105,6 @@ godot_variant gdarchive_get_version_dict( GDNS_PARAM ) {
 	api->godot_variant_destroy(&key);
 	api->godot_variant_destroy(&value);
 
-	
 	api->godot_string_parse_utf8(&s, "minor");
 	api->godot_variant_new_string(&key, &s);
 	api->godot_variant_new_int(&value, minor);
@@ -127,7 +119,6 @@ godot_variant gdarchive_get_version_dict( GDNS_PARAM ) {
 	api->godot_variant_destroy(&key);
 	api->godot_variant_destroy(&value);
 
-
 	api->godot_variant_new_dictionary(&ret, &dict);
 
 	api->godot_string_destroy(&s);
@@ -136,8 +127,7 @@ godot_variant gdarchive_get_version_dict( GDNS_PARAM ) {
 	return ret;
 }
 
-
-godot_variant gdarchive_get_version_details_string( GDNS_PARAM ) {
+godot_variant gdarchive_get_version_details_string(GDNS_PARAM) {
 
 	godot_string s;
 	godot_variant ret;
@@ -152,20 +142,19 @@ godot_variant gdarchive_get_version_details_string( GDNS_PARAM ) {
 	return ret;
 }
 
-
-godot_variant gdarchive_list_files( GDNS_PARAM ) {
+godot_variant gdarchive_list_files(GDNS_PARAM) {
 
 	// TODO: dynamic allocation of char array filename
 	char filename[1024];
-	memset(filename, 0, 1024); 
+	memset(filename, 0, 1024);
 
-	char *arg0 = gdns_get_variant_cstr( p_args[0] );
+	char *arg0 = gdns_get_variant_cstr(p_args[0]);
 
-	if ( memcmp( arg0, "user://", 7) == 0 ) {
+	if (memcmp(arg0, "user://", 7) == 0) {
 		godot_object *os;
 		godot_method_bind *mb;
 
-		os = api->godot_global_get_singleton((char *) "OS");
+		os = api->godot_global_get_singleton((char *)"OS");
 		mb = api->godot_method_bind_get_method("_OS", "get_user_data_dir");
 
 		godot_string path;
@@ -173,17 +162,16 @@ godot_variant gdarchive_list_files( GDNS_PARAM ) {
 		const void *args[1] = {};
 		api->godot_method_bind_ptrcall(mb, os, args, &path);
 
-		char *user_path = gdns_get_string_cstr( &path );
+		char *user_path = gdns_get_string_cstr(&path);
 		strcat(filename, user_path);
 
 		size_t user_path_len = strlen(user_path);
 		size_t arg0_len = strlen(arg0);
-		memcpy( filename + user_path_len , arg0 + 7 - 1, arg0_len - 7 + 1);
-		
+		memcpy(filename + user_path_len, arg0 + 7 - 1, arg0_len - 7 + 1);
+
 		godot_string_destroy(&path);
 		free(user_path);
-	}
-	else {
+	} else {
 		strcat(filename, arg0);
 	}
 	free(arg0);
@@ -218,10 +206,10 @@ godot_variant gdarchive_list_files( GDNS_PARAM ) {
 		api->godot_array_append(&arr, &element);
 		api->godot_variant_destroy(&element);
 
-		archive_read_data_skip(a);  // Note 2
+		archive_read_data_skip(a); // Note 2
 	}
 
-	r = archive_read_free(a);  // Note 3
+	r = archive_read_free(a); // Note 3
 	if (r != ARCHIVE_OK)
 		printf("Archive could not be freed!\n");
 
@@ -232,13 +220,12 @@ godot_variant gdarchive_list_files( GDNS_PARAM ) {
 	return ret;
 }
 
-
-//            _             _   _           
-//   __ _  __| |_ __   __ _| |_(_)_   _____ 
+//            _             _   _
+//   __ _  __| |_ __   __ _| |_(_)_   _____
 //  / _` |/ _` | '_ \ / _` | __| \ \ / / _ \
 // | (_| | (_| | | | | (_| | |_| |\ V /  __/
 //  \__, |\__,_|_| |_|\__,_|\__|_| \_/ \___|
-//  |___/                                   
+//  |___/
 
 void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *p_options) {
 	api = p_options->api_struct;
@@ -254,23 +241,22 @@ void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *p_options) {
 }
 
 void GDN_EXPORT godot_gdnative_terminate(godot_gdnative_terminate_options *p_options) {
-	api = NULL; 
+	api = NULL;
 	nativescript_api = NULL;
 }
 
-
-//              _   _                          _       _   
-//  _ __   __ _| |_(_)_   _____  ___  ___ _ __(_)_ __ | |_ 
+//              _   _                          _       _
+//  _ __   __ _| |_(_)_   _____  ___  ___ _ __(_)_ __ | |_
 // | '_ \ / _` | __| \ \ / / _ \/ __|/ __| '__| | '_ \| __|
-// | | | | (_| | |_| |\ V /  __/\__ \ (__| |  | | |_) | |_ 
+// | | | | (_| | |_| |\ V /  __/\__ \ (__| |  | | |_) | |_
 // |_| |_|\__,_|\__|_| \_/ \___||___/\___|_|  |_| .__/ \__|
 
 void GDN_EXPORT godot_nativescript_init(void *p_handle) {
 
-	GDNS_REGISTER_CLASS( ARCHIVE, Reference, &gdarchive_constructor, &gdarchive_destructor)
+	GDNS_REGISTER_CLASS(ARCHIVE, Reference, &gdarchive_constructor, &gdarchive_destructor)
 
-	GDNS_REGISTER_METHOD( ARCHIVE, get_version_string, &gdarchive_get_version_string)
-	GDNS_REGISTER_METHOD( ARCHIVE, get_version_dict, &gdarchive_get_version_dict)
-	GDNS_REGISTER_METHOD( ARCHIVE, get_version_details_string, &gdarchive_get_version_details_string)
-	GDNS_REGISTER_METHOD( ARCHIVE, list_files, &gdarchive_list_files)
+	GDNS_REGISTER_METHOD(ARCHIVE, get_version_string, &gdarchive_get_version_string)
+	GDNS_REGISTER_METHOD(ARCHIVE, get_version_dict, &gdarchive_get_version_dict)
+	GDNS_REGISTER_METHOD(ARCHIVE, get_version_details_string, &gdarchive_get_version_details_string)
+	GDNS_REGISTER_METHOD(ARCHIVE, list_files, &gdarchive_list_files)
 }
