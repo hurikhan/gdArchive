@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define FILENAME_SIZE 2048
+
 //  ____            _        _
 // |  _ \ _ __ ___ | |_ ___ | |_ _   _ _ __   ___  ___
 // | |_) | '__/ _ \| __/ _ \| __| | | | '_ \ / _ \/ __|
@@ -47,12 +49,12 @@ godot_variant gdarchive_list_files(GDNS_PARAM);
 //  \____|_|\__,_|___/___/
 
 typedef struct user_data_struct {
-	char data[256];
+	char filename[FILENAME_SIZE];
 } user_data_struct;
 
 void *gdarchive_constructor(GDNS_CONSTRUCTOR_PARAM) {
 	user_data_struct *user_data = api->godot_alloc(sizeof(user_data_struct));
-	strcpy(user_data->data, "World from GDNative!");
+	memset(user_data, 0, sizeof(user_data_struct));
 
 	return user_data;
 }
@@ -103,10 +105,10 @@ godot_variant gdarchive_get_version_dict(GDNS_PARAM) {
 
 godot_variant gdarchive_list_files(GDNS_PARAM) {
 
-	// TODO: dynamic allocation of char array filename
-	char filename[1024];
-	memset(filename, 0, 1024);
+	user_data_struct *self;
+	self = p_user_data;
 
+	char *filename = self->filename;
 	char *arg0 = gdns_cstr_new_variant(p_args[0]);
 
 	if (memcmp(arg0, "user://", 7) == 0) {
