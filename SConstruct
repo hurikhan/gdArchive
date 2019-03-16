@@ -1,27 +1,19 @@
 #!/usr/bin/env python
 
-# System
-import glob
-import os
-import string
-import sys
+env = Environment()
 
-platform = "linux"
-include = "#/src/godot_headers"
-libdir = "#/$PLATFORM"
-bindir = "#/"
+opts = Variables(None, ARGUMENTS)
+opts.Add("platform", "Target platform (linux)", "")
+opts.Add(BoolVariable("src_format", "Format source code in src/ with clang-format",False))
+opts.Add("env_print", "Prints the scons enviroment (all|key)", "")
+opts.Update(env)
+Help(opts.GenerateHelpText(env))
 
-env = Environment(
-	PLATFORM = platform,
-	BINDIR = bindir,
-	INCDIR = include,
-	LIBDIR = libdir,
-	CPPPATH = [include],
-	LIBPATH = [libdir],
-	LIBS = "archive")
+if env['src_format']:
+	Execute("clang-format -i --style=file src/*.h")
+	Execute("clang-format -i --style=file src/*.c")
 
-env.Install("#addons/gdArchive", "#build/linux/libgdarchive.so")
-
-Export('env')
-
-env.SConscript('src/SConscript', variant_dir='build/$PLATFORM', duplicate=0)
+if env['platform'] == "linux":
+	Export('env')
+	env.SConscript('src/SConscript', variant_dir='build/$platform', duplicate=0)
+	env.Install("#addons/gdArchive", "#build/linux/libgdarchive.so")

@@ -2,6 +2,19 @@
 
 Import('env')
 
-files = ['gdns.c', 'gdarchive.c']
+env['LIBDIR'] = "#/"
+env['CPPPATH'] = "#/src/godot_headers"
+env['LIBS'] = "archive"
 
-env.SharedLibrary('gdarchive', files)
+env.SharedLibrary('gdarchive', ['gdns.c', 'gdarchive.c'])
+
+# options for debugging the scons environment
+if env['env_print'] != "":
+	ep = env['env_print']
+	print("--------------------------------------------------------")
+	if ep == "all":
+		for key,value in env.items():
+		    print(key, ": ", value)
+	else:
+		print(ep, ": ", env[ep])
+	print("--------------------------------------------------------")
