@@ -2,3 +2,4 @@ godot_headers
 build
 *.swp
 *.dblite
+addons/gdArchive/libgdarchive.so
