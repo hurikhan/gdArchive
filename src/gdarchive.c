@@ -41,6 +41,8 @@ godot_variant gdarchive_get_version_string(GDNS_PARAM);
 godot_variant gdarchive_get_version_dict(GDNS_PARAM);
 godot_variant gdarchive_get_version_details_string(GDNS_PARAM);
 godot_variant gdarchive_list_files(GDNS_PARAM);
+godot_variant gdarchive_open(GDNS_PARAM);
+godot_variant gdarchive_close(GDNS_PARAM);
 
 //   ____ _
 //  / ___| | __ _ ___ ___
@@ -50,6 +52,7 @@ godot_variant gdarchive_list_files(GDNS_PARAM);
 
 typedef struct user_data_struct {
 	char filename[FILENAME_SIZE];
+	struct archive *a;
 } user_data_struct;
 
 void *gdarchive_constructor(GDNS_CONSTRUCTOR_PARAM) {
@@ -103,8 +106,7 @@ godot_variant gdarchive_get_version_dict(GDNS_PARAM) {
 	return ret;
 }
 
-godot_variant gdarchive_list_files(GDNS_PARAM) {
-
+godot_variant gdarchive_open(GDNS_PARAM) {
 	user_data_struct *self;
 	self = p_user_data;
 
@@ -137,28 +139,47 @@ godot_variant gdarchive_list_files(GDNS_PARAM) {
 	}
 	free(arg0);
 
+	self->a = archive_read_new();
+	archive_read_support_filter_all(self->a);
+	archive_read_support_format_all(self->a);
+
+	int r = archive_read_open_filename(self->a, filename, 10240);
+
+	if (r != ARCHIVE_OK)
+		gdns_print("[gdArchive] Could not open archive!");
+
+	godot_variant ret;
+	api->godot_variant_new_int(&ret, 0);
+	return ret;
+}
+
+godot_variant gdarchive_close(GDNS_PARAM) {
+	user_data_struct *self;
+	self = p_user_data;
+
+	int r = archive_read_free(self->a); // TODO: Check if opened
+	if (r != ARCHIVE_OK)
+		gdns_print("[gdArchive] Archive could not be freed!");
+
+	godot_variant ret;
+	api->godot_variant_new_int(&ret, 0);
+	return ret;
+}
+
+godot_variant gdarchive_list_files(GDNS_PARAM) {
+	user_data_struct *self;
+	self = p_user_data;
+
+	struct archive_entry *entry;
 	godot_array arr;
 	godot_string s;
 	godot_variant element;
 
 	godot_array_new(&arr);
 
-	// --------------------
+	// TODO: Check if opened
 
-	struct archive *a;
-	struct archive_entry *entry;
-	int r;
-
-	a = archive_read_new();
-	archive_read_support_filter_all(a);
-	archive_read_support_format_all(a);
-
-	r = archive_read_open_filename(a, filename, 10240); // Note 1
-
-	if (r != ARCHIVE_OK)
-		gdns_print("[gdArchive] Could not open archive!");
-
-	while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
+	while (archive_read_next_header(self->a, &entry) == ARCHIVE_OK) {
 		api->godot_string_new(&s);
 		api->godot_string_parse_utf8(&s, archive_entry_pathname(entry));
 		api->godot_variant_new_string(&element, &s);
@@ -167,12 +188,8 @@ godot_variant gdarchive_list_files(GDNS_PARAM) {
 		api->godot_array_append(&arr, &element);
 		api->godot_variant_destroy(&element);
 
-		archive_read_data_skip(a); // Note 2
+		archive_read_data_skip(self->a);
 	}
-
-	r = archive_read_free(a); // Note 3
-	if (r != ARCHIVE_OK)
-		gdns_print("[gdArchive] Archive could not be freed!");
 
 	godot_variant ret;
 	godot_variant_new_array(&ret, &arr);
