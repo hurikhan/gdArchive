@@ -1,3 +1,4 @@
 godot_headers
-bin
+build
 *.swp
+*.dblite
