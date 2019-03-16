@@ -1,0 +1,7 @@
+[godot]
+
+Server.64="../../godot/bin/godot_server.x11.tools.64.llvm"
+X11.64=""
+Windows.32=""
+Windows.64=""
+OSX.64=""

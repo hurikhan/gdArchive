@@ -3,3 +3,4 @@ build
 *.swp
 *.dblite
 addons/gdArchive/libgdarchive.so
+test/addons
