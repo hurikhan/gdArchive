@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define VERSION "gdArchive 0.0.1"
 #define FILENAME_SIZE 2048
 
 //  ____            _        _
@@ -37,9 +38,12 @@
 void *gdarchive_constructor(GDNS_CONSTRUCTOR_PARAM);
 void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM);
 
+godot_variant gdarchive_get_version(GDNS_PARAM);
+// ---------------------------------------------
 godot_variant gdarchive_get_version_string(GDNS_PARAM);
 godot_variant gdarchive_get_version_dict(GDNS_PARAM);
 godot_variant gdarchive_get_version_details_string(GDNS_PARAM);
+// ---------------------------------------------
 godot_variant gdarchive_list_files(GDNS_PARAM);
 godot_variant gdarchive_open(GDNS_PARAM);
 godot_variant gdarchive_close(GDNS_PARAM);
@@ -81,6 +85,13 @@ void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM) {
 // | |\/| |/ _ \ __| '_ \ / _ \ / _` / __|
 // | |  | |  __/ |_| | | | (_) | (_| \__ \
 // |_|  |_|\___|\__|_| |_|\___/ \__,_|___/
+
+
+godot_variant gdarchive_get_version(GDNS_PARAM) {
+	godot_variant ret = gdns_variant_new_cstr(VERSION);
+
+	return ret;
+}
 
 godot_variant gdarchive_get_version_string(GDNS_PARAM) {
 
@@ -262,6 +273,7 @@ void GDN_EXPORT godot_nativescript_init(void *p_handle) {
 
 	GDNS_REGISTER_CLASS(ARCHIVE, Reference, &gdarchive_constructor, &gdarchive_destructor)
 
+	GDNS_REGISTER_METHOD(ARCHIVE, get_version, &gdarchive_get_version)
 	GDNS_REGISTER_METHOD(ARCHIVE, get_version_string, &gdarchive_get_version_string)
 	GDNS_REGISTER_METHOD(ARCHIVE, get_version_dict, &gdarchive_get_version_dict)
 	GDNS_REGISTER_METHOD(ARCHIVE, get_version_details_string, &gdarchive_get_version_details_string)
