@@ -68,7 +68,7 @@ void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM) {
 	self = p_user_data;
 
 	if (self->opened) {
-		int r = archive_read_free(self->a); // TODO: Check if opened
+		int r = archive_read_free(self->a);
 		if (r != ARCHIVE_OK)
 			gdns_print("[gdArchive-destructor] Archive could not be freed!");
 	}
@@ -144,7 +144,8 @@ godot_variant gdarchive_open(GDNS_PARAM) {
 
 		godot_string_destroy(&path);
 		gdns_free(user_path);
-	} else {
+	}
+	else {
 		strcat(filename, arg0);
 	}
 	gdns_free(arg0);
@@ -154,8 +155,6 @@ godot_variant gdarchive_open(GDNS_PARAM) {
 	archive_read_support_format_all(self->a);
 
 	int r = archive_read_open_filename(self->a, filename, 10240);
-
-	// Set return value
 
 	godot_variant ret;
 
@@ -175,18 +174,21 @@ godot_variant gdarchive_close(GDNS_PARAM) {
 	user_data_struct *self;
 	self = p_user_data;
 
-	int r = archive_read_free(self->a); // TODO: Check if opened
-
-	// Set return value
-
 	godot_variant ret;
 
-	if (r == ARCHIVE_OK) {
-		self->opened = false;
-		api->godot_variant_new_bool(&ret, true);
+	if (self->opened) {
+		int r = archive_read_free(self->a);
+
+		if (r == ARCHIVE_OK)  {
+			self->opened = false;
+			api->godot_variant_new_bool(&ret, true);
+		}
+		else {
+			gdns_print("[gdArchive] Archive could not be freed!");
+			api->godot_variant_new_bool(&ret, false);
+		}
 	}
 	else {
-		gdns_print("[gdArchive] Archive could not be freed!");
 		api->godot_variant_new_bool(&ret, false);
 	}
 
