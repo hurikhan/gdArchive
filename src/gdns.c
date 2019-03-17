@@ -55,7 +55,7 @@ char *gdns_cstr_new_string(godot_string *p_string) {
 	const char *cstr = api->godot_char_string_get_data(&char_str);
 	api->godot_char_string_destroy(&char_str);
 
-	char *ret = malloc(strlen(cstr));
+	char *ret = api->godot_alloc(strlen(cstr));
 	strcpy(ret, cstr);
 
 	return ret;
@@ -68,9 +68,9 @@ char *gdns_cstr_new_variant(godot_variant *p_variant) {
 	char *cstr = gdns_cstr_new_string(&str);
 	godot_string_destroy(&str);
 
-	char *ret = malloc(strlen(cstr + 1));
+	char *ret = api->godot_alloc(strlen(cstr + 1));
 	strcpy(ret, cstr);
-	free(cstr);
+	api->godot_free(cstr);
 
 	return ret;
 }
