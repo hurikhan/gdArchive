@@ -133,7 +133,7 @@ godot_variant gdarchive_open(GDNS_PARAM) {
 		memcpy(filename + user_path_len, arg0 + 7 - 1, arg0_len - 7 + 2);
 
 		godot_string_destroy(&path);
-		free(user_path);
+		gdns_free(user_path);
 	} else {
 		strcat(filename, arg0);
 	}
@@ -236,5 +236,7 @@ void GDN_EXPORT godot_nativescript_init(void *p_handle) {
 	GDNS_REGISTER_METHOD(ARCHIVE, get_version_string, &gdarchive_get_version_string)
 	GDNS_REGISTER_METHOD(ARCHIVE, get_version_dict, &gdarchive_get_version_dict)
 	GDNS_REGISTER_METHOD(ARCHIVE, get_version_details_string, &gdarchive_get_version_details_string)
+	GDNS_REGISTER_METHOD(ARCHIVE, open, &gdarchive_open)
+	GDNS_REGISTER_METHOD(ARCHIVE, close, &gdarchive_close)
 	GDNS_REGISTER_METHOD(ARCHIVE, list_files, &gdarchive_list_files)
 }
