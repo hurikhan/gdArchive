@@ -145,8 +145,6 @@ godot_variant gdarchive_get_info(GDNS_PARAM) {
 			char *name = strtok(e, "/");
 			char *version = strtok(NULL, "/");
 
-			printf("%s\n", libs[i]);
-
 			gdns_dictionary_set_cstr(&dict, name, version);
 			api->godot_free(e);
 		}
