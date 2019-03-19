@@ -41,7 +41,7 @@ void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM);
 
 godot_variant gdarchive_get_version(GDNS_PARAM);
 godot_variant gdarchive_get_info(GDNS_PARAM);
-godot_variant gdarchive_list_files(GDNS_PARAM);
+godot_variant gdarchive_list(GDNS_PARAM);
 godot_variant gdarchive_open(GDNS_PARAM);
 godot_variant gdarchive_close(GDNS_PARAM);
 
@@ -114,6 +114,9 @@ godot_variant gdarchive_get_info(GDNS_PARAM) {
 	}
 
 	// get libarchive version "libarchive x.y.z ..."
+	// archive_version_details() example:
+	// 	"libarchive 3.3.3 zlib/1.2.11 liblzma/5.2.4 bz2lib/1.0.6"
+	//       [---------------]
 	char *libarchive_name = strtok(buffer, " ");
 	char *libarchive_version = strtok(NULL, " ");
 	count -= 2;
@@ -122,12 +125,19 @@ godot_variant gdarchive_get_info(GDNS_PARAM) {
 	if (libarchive_name != NULL && libarchive_version != NULL)
 		gdns_dictionary_set_cstr(&dict, libarchive_name, libarchive_version);
 
+	// Add following libs entry from libarchive to the dictionary
+	// archive_version_details() example:
+	// 	"libarchive 3.3.3 zlib/1.2.11 liblzma/5.2.4 bz2lib/1.0.6"
+	//                        [------------------------------------]
 	if (count > 0) {
 		char **libs = api->godot_alloc(sizeof(char*) * count);
 		size_t libs_idx = 0;
 
 		char* lib_entry = "";
 
+		// get entries seperated by ' '
+		// 	"libarchive 3.3.3 zlib/1.2.11 liblzma/5.2.4 bz2lib/1.0.6"
+		//                        [---------] [-----------] [----------]
 		while( lib_entry ) {
 			lib_entry = strtok(NULL, " ");
 			if (lib_entry) {
@@ -139,6 +149,10 @@ godot_variant gdarchive_get_info(GDNS_PARAM) {
 			}
 		}
 
+		// split found entries seperated by '/'
+		// and add them to the dictionary
+		// 	"libarchive 3.3.3 zlib/1.2.11 liblzma/5.2.4 bz2lib/1.0.6"
+		//                        [--] [----] [-----] [---] [----] [---]
 		for (int i=0; i < libs_idx; i++) {
 			char *e = libs[i]; 
 
@@ -239,7 +253,7 @@ godot_variant gdarchive_close(GDNS_PARAM) {
 	return ret;
 }
 
-godot_variant gdarchive_list_files(GDNS_PARAM) {
+godot_variant gdarchive_list(GDNS_PARAM) {
 	user_data_struct *self;
 	self = p_user_data;
 
