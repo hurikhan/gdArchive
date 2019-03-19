@@ -4,7 +4,7 @@ gdnative plugin for libarchive in pure C
 ## Status
 * Version: 0.0.1
 * Platforms: linux
-* Dependencies: libarchive
+* Dependencies: libarchive 3.3.3+
 
 ## Compile
 ```bash
@@ -40,6 +40,7 @@ gdnative plugin for libarchive in pure C
 - [x] Supported platforms: linux
 - [x] List files in archive
 - [ ] Extract files from archive
+- [ ] UTF-8 support
 - [ ] Complete manual invoked tests/ for the current API
 - [ ] Create Docker-Container for libgdarchive.so + libarchive.so compilation
 - [ ] Bundle gdArchive with libarchive.so
