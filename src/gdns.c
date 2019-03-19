@@ -75,6 +75,15 @@ char *gdns_cstr_new_variant(godot_variant *p_variant) {
 	return ret;
 }
 
+godot_string gdns_string_new_cstr(const char *p_cstr) {
+	godot_string ret;
+
+	api->godot_string_new(&ret);
+	api->godot_string_parse_utf8(&ret, p_cstr);
+
+	return ret;
+}
+
 godot_variant gdns_variant_new_cstr(const char *p_cstr) {
 	godot_string s;
 	godot_variant ret;
@@ -96,29 +105,32 @@ godot_variant *gdns_variant_new_int(int p_value) {
 	return ret;
 }
 
-godot_dictionary *gdns_dictionary_new() {
-	godot_dictionary *dict;
-
-	dict = api->godot_alloc(GODOT_DICTIONARY_SIZE);
-	api->godot_dictionary_new(dict);
-
-	return dict;
+void gdns_dictionary_new(godot_dictionary *p_dict) {
+	api->godot_dictionary_new(p_dict);
 }
 
 void gdns_dictionary_destroy(godot_dictionary *p_dict) {
 	api->godot_dictionary_destroy(p_dict);
-	api->godot_free(p_dict);
 }
 
 void gdns_dictionary_set_int(godot_dictionary *p_dict, const char *p_key, int p_value) {
 	godot_variant key;
-	godot_variant *value;
+	godot_variant value;
 
 	key = gdns_variant_new_cstr(p_key);
-	value = gdns_variant_new_int(p_value);
+	api->godot_variant_new_int(&value, p_value);
 
-	api->godot_dictionary_set(p_dict, &key, value);
-	api->godot_free(value);
+	api->godot_dictionary_set(p_dict, &key, &value);
+}
+
+void gdns_dictionary_set_cstr(godot_dictionary *p_dict, const char *p_key, const char *p_value) {
+	godot_variant key;
+	godot_variant value;
+
+	key = gdns_variant_new_cstr(p_key);
+	value = gdns_variant_new_cstr(p_value);
+
+	api->godot_dictionary_set(p_dict, &key, &value);
 }
 
 void gdns_free(void *ptr) {

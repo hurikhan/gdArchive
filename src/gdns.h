@@ -74,9 +74,10 @@ char *gdns_cstr_new_string(godot_string *p_string);
 char *gdns_cstr_new_variant(godot_variant *p_variant);
 godot_variant gdns_variant_new_cstr(const char *p_cstr);
 godot_variant *gdns_variant_new_int(int p_value);
-godot_dictionary *gdns_dictionary_new();
+void gdns_dictionary_new(godot_dictionary *p_dict);
 void gdns_dictionary_destroy(godot_dictionary *p_dict);
 void gdns_dictionary_set_int(godot_dictionary *p_dict, const char *p_key, int p_value);
+void gdns_dictionary_set_cstr(godot_dictionary *p_dict, const char *p_key, const char *value);
 void gdns_free(void *ptr);
 
 #endif

@@ -25,7 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define VERSION "gdArchive 0.0.1"
+#define VERSION "0.0.1"
+#define VERSION_STRING "gdarchive 0.0.1"
 #define FILENAME_SIZE 2048
 
 //  ____            _        _
@@ -39,11 +40,7 @@ void *gdarchive_constructor(GDNS_CONSTRUCTOR_PARAM);
 void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM);
 
 godot_variant gdarchive_get_version(GDNS_PARAM);
-// ---------------------------------------------
-godot_variant gdarchive_get_version_string(GDNS_PARAM);
-godot_variant gdarchive_get_version_dict(GDNS_PARAM);
-godot_variant gdarchive_get_version_details_string(GDNS_PARAM);
-// ---------------------------------------------
+godot_variant gdarchive_get_info(GDNS_PARAM);
 godot_variant gdarchive_list_files(GDNS_PARAM);
 godot_variant gdarchive_open(GDNS_PARAM);
 godot_variant gdarchive_close(GDNS_PARAM);
@@ -86,46 +83,84 @@ void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM) {
 // | |  | |  __/ |_| | | | (_) | (_| \__ \
 // |_|  |_|\___|\__|_| |_|\___/ \__,_|___/
 
-
 godot_variant gdarchive_get_version(GDNS_PARAM) {
-	godot_variant ret = gdns_variant_new_cstr(VERSION);
+	godot_variant ret = gdns_variant_new_cstr(VERSION_STRING);
 
 	return ret;
 }
 
-godot_variant gdarchive_get_version_string(GDNS_PARAM) {
+godot_variant gdarchive_get_info(GDNS_PARAM) {
+	godot_dictionary dict;
+	godot_string s;
 
-	const char *version = archive_version_string();
-	godot_variant ret = gdns_variant_new_cstr(version);
+	godot_dictionary_new(&dict);
 
-	return ret;
-}
+	// gdArchive Version
+	gdns_dictionary_set_cstr(&dict, "gdarchive", VERSION);
 
-godot_variant gdarchive_get_version_details_string(GDNS_PARAM) {
+	// libarchive version details
+	const char *details = archive_version_details();
+	char *buffer = api->godot_alloc(strlen(details));
+	memcpy(buffer, details, strlen(details));
 
-	const char *version_details = archive_version_details();
-	godot_variant ret = gdns_variant_new_cstr(version_details);
+	// count space delimters	
+	char *tmp = buffer;
+	size_t count = 0;
+	while(*tmp) {
+		if ( ' ' == *tmp ) {
+			count++;
+		}
+		tmp++;
+	}
 
-	return ret;
-}
+	// get libarchive version "libarchive x.y.z ..."
+	char *libarchive_name = strtok(buffer, " ");
+	char *libarchive_version = strtok(NULL, " ");
+	count -= 2;
 
-godot_variant gdarchive_get_version_dict(GDNS_PARAM) {
+	// Add libarchive entry to the dictionary
+	if (libarchive_name != NULL && libarchive_version != NULL)
+		gdns_dictionary_set_cstr(&dict, libarchive_name, libarchive_version);
+
+	if (count > 0) {
+		char **libs = api->godot_alloc(sizeof(char*) * count);
+		size_t libs_idx = 0;
+
+		char* lib_entry = "";
+
+		while( lib_entry ) {
+			lib_entry = strtok(NULL, " ");
+			if (lib_entry) {
+				char *e = api->godot_alloc(strlen(lib_entry));
+				memcpy(e, lib_entry, strlen(lib_entry));
+				
+				libs[libs_idx] = e;
+				libs_idx++;
+			}
+		}
+
+		for (int i=0; i < libs_idx; i++) {
+			char *e = libs[i]; 
+
+			char *name = strtok(e, "/");
+			char *version = strtok(NULL, "/");
+
+			printf("%s\n", libs[i]);
+
+			gdns_dictionary_set_cstr(&dict, name, version);
+			api->godot_free(e);
+		}
+
+		api->godot_free(libs);
+	}
+	api->godot_free(buffer);
+
 	godot_variant ret;
-	godot_dictionary *dict;
-
-	int major = archive_version_number() / 1000000;
-	int minor = (archive_version_number() / 1000) % 1000;
-	int patch = archive_version_number() % 1000;
-
-	dict = gdns_dictionary_new();
-	gdns_dictionary_set_int(dict, "major", major);
-	gdns_dictionary_set_int(dict, "minor", minor);
-	gdns_dictionary_set_int(dict, "patch", patch);
-
-	api->godot_variant_new_dictionary(&ret, dict);
-	gdns_dictionary_destroy(dict);
+	api->godot_variant_new_dictionary(&ret, &dict);
+	gdns_dictionary_destroy(&dict);
+	
 	return ret;
-}
+}	
 
 godot_variant gdarchive_open(GDNS_PARAM) {
 	user_data_struct *self;
@@ -274,9 +309,7 @@ void GDN_EXPORT godot_nativescript_init(void *p_handle) {
 	GDNS_REGISTER_CLASS(ARCHIVE, Reference, &gdarchive_constructor, &gdarchive_destructor)
 
 	GDNS_REGISTER_METHOD(ARCHIVE, get_version, &gdarchive_get_version)
-	GDNS_REGISTER_METHOD(ARCHIVE, get_version_string, &gdarchive_get_version_string)
-	GDNS_REGISTER_METHOD(ARCHIVE, get_version_dict, &gdarchive_get_version_dict)
-	GDNS_REGISTER_METHOD(ARCHIVE, get_version_details_string, &gdarchive_get_version_details_string)
+	GDNS_REGISTER_METHOD(ARCHIVE, get_info, &gdarchive_get_info)
 	GDNS_REGISTER_METHOD(ARCHIVE, open, &gdarchive_open)
 	GDNS_REGISTER_METHOD(ARCHIVE, close, &gdarchive_close)
 	GDNS_REGISTER_METHOD(ARCHIVE, list_files, &gdarchive_list_files)
