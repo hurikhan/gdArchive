@@ -2,6 +2,9 @@
 
 env = Environment()
 
+env['CC'] = "clang"
+env['CFLAGS'] = "-std=c11 -g -fcolor-diagnostics"
+
 opts = Variables(None, ARGUMENTS)
 opts.Add("platform", "Target platform (linux)", "")
 opts.Add(BoolVariable("src_format", "Format source code in src/ with clang-format",False))
