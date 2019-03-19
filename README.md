@@ -1,8 +1,17 @@
 # gdArchive
 gdnative plugin for libarchive in pure C
 
-## Methods
+## Status
+* Version: 0.0.1
+* Platforms: linux
+* Dependencies: libarchive
 
+## Compile
+```bash
+  scons platform=linux
+```
+
+## Methods
 ```gdscript
   get_version()   # Returns the current version of gdArchive as a string (e.g. "gdarchive 0.0.1")
   get_info()      # Returns the current used libarchive version and compression libs as a dictionary
@@ -25,3 +34,15 @@ gdnative plugin for libarchive in pure C
   for f in files:
 	  print(f)
 ```
+
+## ToDo
+### Version 0.1.0
+- [x] Supported platforms: linux
+- [x] List files in archive
+- [ ] Extract files from archive
+- [ ] Complete manual invoked tests/ for the current API
+- [ ] Create Docker-Container for lingdarchive.so + libarchive.so compilation
+- [ ] Bundle gdArchive with libarchive.so
+### Version 0.2.0
+- [ ] Supported platforms: linux, windows
+- [ ] Invoke tests/ with scons
