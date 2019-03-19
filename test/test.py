@@ -13,10 +13,22 @@ config = toml.load("test.toml")
 godot = config['godot']['Server']['64']
 
 tests = [
-	"test_001.gd",
-	"test_002.gd",
-	"test_003.gd"
+	"0001_get_version.gd",
+	"0002_get_info.gd",
+	"0003_open_close.gd",
+	"0004_list.gd"
 	]
+
+def _result(s1, s2):
+	text_len = len(s1)
+	padding_len = 50 - text_len
+
+	padding = ""
+	for i in range(padding_len):
+		padding = padding + "."
+
+	print( s1 + padding + s2 )
+
 
 
 for test in tests:
@@ -26,14 +38,14 @@ for test in tests:
 		ret = ret.decode("utf-8")
 
 		if ret.endswith("\n[TEST OK]\n"):
-			print( test + "................................[OK]" )
+			_result(test, "[OK]")
 		else:
-			print( test + "................................[FAILED]" )
+			_result(test, "[FAILED]")
 
 	except TimeoutExpired:
-		print( test + "................................[TIMEOUT]" )
+		_result(test, "[TIMEOUT]")
 	except CalledProcessError:
-		print( test + "................................[FAILED]" )
+		_result(test, "[RETURN != 0]")
 
 	if len(argv) == 2:
 		if argv[1] == "-v":

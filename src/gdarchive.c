@@ -180,6 +180,7 @@ godot_variant gdarchive_open(GDNS_PARAM) {
 
 	char *filename = self->filename;
 	char *arg0 = gdns_cstr_new_variant(p_args[0]);
+	size_t arg0_len = strlen(arg0);
 
 	if (memcmp(arg0, "user://", 7) == 0) {
 		godot_object *os;
@@ -197,13 +198,12 @@ godot_variant gdarchive_open(GDNS_PARAM) {
 		strcat(filename, user_path);
 
 		size_t user_path_len = strlen(user_path);
-		size_t arg0_len = strlen(arg0); //TODO: check max length -> FILENAME_SIZE
-		memcpy(filename + user_path_len, arg0 + 7 - 1, arg0_len - 7 + 2);
+		memcpy(filename + user_path_len, arg0 + 7 - 1, arg0_len - 7 + 2); //TODO: check max length -> FILENAME_SIZE
 
 		godot_string_destroy(&path);
 		gdns_free(user_path);
 	} else {
-		strcat(filename, arg0);
+		memcpy(filename, arg0, arg0_len + 1);
 	}
 	gdns_free(arg0);
 
@@ -220,6 +220,7 @@ godot_variant gdarchive_open(GDNS_PARAM) {
 		api->godot_variant_new_bool(&ret, true);
 	} else {
 		gdns_print("[gdArchive] Could not open archive!");
+		memset(self->filename, 0, sizeof(self->filename));
 		api->godot_variant_new_bool(&ret, false);
 	}
 
@@ -245,6 +246,8 @@ godot_variant gdarchive_close(GDNS_PARAM) {
 	} else {
 		api->godot_variant_new_bool(&ret, false);
 	}
+
+	memset(self->filename, 0, sizeof(self->filename));
 
 	return ret;
 }
