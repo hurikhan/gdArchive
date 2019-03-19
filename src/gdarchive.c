@@ -103,11 +103,11 @@ godot_variant gdarchive_get_info(GDNS_PARAM) {
 	char *buffer = api->godot_alloc(strlen(details));
 	memcpy(buffer, details, strlen(details));
 
-	// count space delimters	
+	// count space delimters
 	char *tmp = buffer;
 	size_t count = 0;
-	while(*tmp) {
-		if ( ' ' == *tmp ) {
+	while (*tmp) {
+		if (' ' == *tmp) {
 			count++;
 		}
 		tmp++;
@@ -130,20 +130,20 @@ godot_variant gdarchive_get_info(GDNS_PARAM) {
 	// 	"libarchive 3.3.3 zlib/1.2.11 liblzma/5.2.4 bz2lib/1.0.6"
 	//                        [------------------------------------]
 	if (count > 0) {
-		char **libs = api->godot_alloc(sizeof(char*) * count);
+		char **libs = api->godot_alloc(sizeof(char *) * count);
 		size_t libs_idx = 0;
 
-		char* lib_entry = "";
+		char *lib_entry = "";
 
 		// get entries seperated by ' '
 		// 	"libarchive 3.3.3 zlib/1.2.11 liblzma/5.2.4 bz2lib/1.0.6"
 		//                        [---------] [-----------] [----------]
-		while( lib_entry ) {
+		while (lib_entry) {
 			lib_entry = strtok(NULL, " ");
 			if (lib_entry) {
 				char *e = api->godot_alloc(strlen(lib_entry));
 				memcpy(e, lib_entry, strlen(lib_entry));
-				
+
 				libs[libs_idx] = e;
 				libs_idx++;
 			}
@@ -153,8 +153,8 @@ godot_variant gdarchive_get_info(GDNS_PARAM) {
 		// and add them to the dictionary
 		// 	"libarchive 3.3.3 zlib/1.2.11 liblzma/5.2.4 bz2lib/1.0.6"
 		//                        [--] [----] [-----] [---] [----] [---]
-		for (int i=0; i < libs_idx; i++) {
-			char *e = libs[i]; 
+		for (int i = 0; i < libs_idx; i++) {
+			char *e = libs[i];
 
 			char *name = strtok(e, "/");
 			char *version = strtok(NULL, "/");
@@ -170,9 +170,9 @@ godot_variant gdarchive_get_info(GDNS_PARAM) {
 	godot_variant ret;
 	api->godot_variant_new_dictionary(&ret, &dict);
 	gdns_dictionary_destroy(&dict);
-	
+
 	return ret;
-}	
+}
 
 godot_variant gdarchive_open(GDNS_PARAM) {
 	user_data_struct *self;
@@ -197,13 +197,12 @@ godot_variant gdarchive_open(GDNS_PARAM) {
 		strcat(filename, user_path);
 
 		size_t user_path_len = strlen(user_path);
-		size_t arg0_len = strlen(arg0);	//TODO: check max length -> FILENAME_SIZE
+		size_t arg0_len = strlen(arg0); //TODO: check max length -> FILENAME_SIZE
 		memcpy(filename + user_path_len, arg0 + 7 - 1, arg0_len - 7 + 2);
 
 		godot_string_destroy(&path);
 		gdns_free(user_path);
-	}
-	else {
+	} else {
 		strcat(filename, arg0);
 	}
 	gdns_free(arg0);
@@ -219,8 +218,7 @@ godot_variant gdarchive_open(GDNS_PARAM) {
 	if (r == ARCHIVE_OK) {
 		self->opened = true;
 		api->godot_variant_new_bool(&ret, true);
-	}
-	else {
+	} else {
 		gdns_print("[gdArchive] Could not open archive!");
 		api->godot_variant_new_bool(&ret, false);
 	}
@@ -237,16 +235,14 @@ godot_variant gdarchive_close(GDNS_PARAM) {
 	if (self->opened) {
 		int r = archive_read_free(self->a);
 
-		if (r == ARCHIVE_OK)  {
+		if (r == ARCHIVE_OK) {
 			self->opened = false;
 			api->godot_variant_new_bool(&ret, true);
-		}
-		else {
+		} else {
 			gdns_print("[gdArchive] Archive could not be freed!");
 			api->godot_variant_new_bool(&ret, false);
 		}
-	}
-	else {
+	} else {
 		api->godot_variant_new_bool(&ret, false);
 	}
 
