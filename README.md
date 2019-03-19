@@ -6,6 +6,11 @@ gdnative plugin for libarchive in pure C
 * Platforms: linux
 * Dependencies: libarchive 3.3.3+
 
+## Clone
+```bash
+  git clone --recurse-submodules https://github.com/hurikhan/gdArchive.git
+```
+
 ## Compile
 ```bash
   scons platform=linux
@@ -45,5 +50,6 @@ gdnative plugin for libarchive in pure C
 - [ ] Create Docker-Container for libgdarchive.so + libarchive.so compilation
 - [ ] Bundle gdArchive with libarchive.so
 ### Version 0.2.0
+- [ ] Nativescript 1.1 support
 - [ ] Supported platforms: linux, windows
 - [ ] Invoke tests/ with scons
