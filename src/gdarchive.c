@@ -324,5 +324,5 @@ void GDN_EXPORT godot_nativescript_init(void *p_handle) {
 	GDNS_REGISTER_METHOD(ARCHIVE, get_info, &gdarchive_get_info)
 	GDNS_REGISTER_METHOD(ARCHIVE, open, &gdarchive_open)
 	GDNS_REGISTER_METHOD(ARCHIVE, close, &gdarchive_close)
-	GDNS_REGISTER_METHOD(ARCHIVE, list_files, &gdarchive_list_files)
+	GDNS_REGISTER_METHOD(ARCHIVE, list_files, &gdarchive_list)
 }
