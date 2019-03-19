@@ -17,7 +17,7 @@ gdnative plugin for libarchive in pure C
   get_info()      # Returns the current used libarchive version and compression libs as a dictionary
   open(filename)  # Opens an archive as readonly. Returns true on success
   close()         # Closes an already opened archive. Returns true on success
-  list()          # Lists the file of an opened archive. Returns an array.
+  list()          # Returns an array of the archive entries
 ```
 
 ## Usage
@@ -41,7 +41,7 @@ gdnative plugin for libarchive in pure C
 - [x] List files in archive
 - [ ] Extract files from archive
 - [ ] Complete manual invoked tests/ for the current API
-- [ ] Create Docker-Container for lingdarchive.so + libarchive.so compilation
+- [ ] Create Docker-Container for libgdarchive.so + libarchive.so compilation
 - [ ] Bundle gdArchive with libarchive.so
 ### Version 0.2.0
 - [ ] Supported platforms: linux, windows
