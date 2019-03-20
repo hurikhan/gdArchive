@@ -23,6 +23,8 @@ gdnative plugin for libarchive in pure C
   open(filename)  # Opens an archive as readonly. Returns true on success
   close()         # Closes an already opened archive. Returns true on success
   list()          # Returns an array of the archive entries
+  extract()	  # Extracts the whole archive in the current directory
+  extract(path)   # Extracts the whole archive in the specified path
 ```
 
 ## Usage
