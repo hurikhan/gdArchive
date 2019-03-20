@@ -45,6 +45,10 @@ godot_variant gdarchive_open(GDNS_PARAM);
 godot_variant gdarchive_close(GDNS_PARAM);
 godot_variant gdarchive_list(GDNS_PARAM);
 godot_variant gdarchive_extract(GDNS_PARAM);
+
+char *_gdarchive_path(char *p_path);
+int _gdarchive_copy_data(struct archive *ar, struct archive *aw); // Helper for gdarchive_extract
+
 //   ____ _
 //  / ___| | __ _ ___ ___
 // | |   | |/ _` / __/ __|
@@ -55,7 +59,7 @@ typedef struct user_data_struct {
 	char filename[FILENAME_SIZE];
 	struct archive *a;
 	bool opened; // Archive is opened (successfully)
-	bool listed; // archive.list() was called
+	bool used; // archive.list() was called
 } user_data_struct;
 
 void *gdarchive_constructor(GDNS_CONSTRUCTOR_PARAM) {
@@ -175,44 +179,22 @@ godot_variant gdarchive_get_info(GDNS_PARAM) {
 	return ret;
 }
 
+// TODO: add tests/ for "res://.." and absolute pathes
 godot_variant gdarchive_open(GDNS_PARAM) {
 	user_data_struct *self;
 	self = p_user_data;
 
-	char *filename = self->filename;
 	char *arg0 = gdns_cstr_new_variant(p_args[0]);
-	size_t arg0_len = strlen(arg0);
-
-	if (memcmp(arg0, "user://", 7) == 0) {
-		godot_object *os;
-		godot_method_bind *mb;
-
-		os = api->godot_global_get_singleton((char *)"OS");
-		mb = api->godot_method_bind_get_method("_OS", "get_user_data_dir");
-
-		godot_string path;
-		godot_string_new(&path);
-		const void *args[1] = {};
-		api->godot_method_bind_ptrcall(mb, os, args, &path);
-
-		char *user_path = gdns_cstr_new_string(&path);
-		strcat(filename, user_path);
-
-		size_t user_path_len = strlen(user_path);
-		memcpy(filename + user_path_len, arg0 + 7 - 1, arg0_len - 7 + 2); //TODO: check max length -> FILENAME_SIZE
-
-		godot_string_destroy(&path);
-		gdns_free(user_path);
-	} else {
-		memcpy(filename, arg0, arg0_len + 1);
-	}
+	char *path = _gdarchive_path(arg0);
+	memcpy(self->filename, path, strlen(path) + 1);
+	gdns_free(path);
 	gdns_free(arg0);
 
 	self->a = archive_read_new();
 	archive_read_support_filter_all(self->a);
 	archive_read_support_format_all(self->a);
 
-	int r = archive_read_open_filename(self->a, filename, 10240);
+	int r = archive_read_open_filename(self->a, self->filename, 10240);
 
 	godot_variant ret;
 
@@ -257,9 +239,9 @@ godot_variant gdarchive_list(GDNS_PARAM) {
 	user_data_struct *self;
 	self = p_user_data;
 
-	if (self->opened && self->listed) {
+	if (self->opened && self->used) {
 		// archive is already opened(self->opened) and the
-		// archive_read_next_header() function was already called (self->listed).
+		// archive_read_next_header() function was already called (self->used).
 		//
 		// To get a fresh struct archive *a (self->a):
 		//   1. gdarchive_close() is called
@@ -293,6 +275,8 @@ godot_variant gdarchive_list(GDNS_PARAM) {
 
 	if (self->opened) {
 		while (archive_read_next_header(self->a, &entry) == ARCHIVE_OK) {
+			self->used = true;
+
 			api->godot_string_new(&s);
 			api->godot_string_parse_utf8(&s, archive_entry_pathname(entry));
 			api->godot_variant_new_string(&element, &s);
@@ -302,7 +286,6 @@ godot_variant gdarchive_list(GDNS_PARAM) {
 			api->godot_variant_destroy(&element);
 
 			archive_read_data_skip(self->a);
-			self->listed = true;
 		}
 	}
 
@@ -314,6 +297,124 @@ godot_variant gdarchive_list(GDNS_PARAM) {
 }
 
 godot_variant gdarchive_extract(GDNS_PARAM) {
+	user_data_struct *self;
+	self = p_user_data;
+
+	char *arg0 = gdns_cstr_new_variant(p_args[0]);
+
+	char *destination = NULL;
+	size_t destination_len = 0;
+
+	// Eval p_args[0] -> destination
+	if (p_num_args == 1) {
+		destination = _gdarchive_path(arg0);
+		destination_len = strlen(destination);
+	}
+
+	// TODO: DRY!
+	if (self->opened && self->used) {
+		// archive is already opened(self->opened) and the
+		// archive_read_next_header() function was already called (self->listed).
+		//
+		// To get a fresh struct archive *a (self->a):
+		//   1. gdarchive_close() is called
+		//   2. gdarchive_open(filename) is called
+		//
+		godot_variant filename = gdns_variant_new_cstr(self->filename);
+		godot_variant *_p_args[1];
+		_p_args[0] = &filename;
+
+		godot_variant ret_close = gdarchive_close(p_instance,
+				NULL,
+				p_user_data,
+				0,
+				NULL);
+
+		godot_variant ret_open = gdarchive_open(p_instance,
+				NULL,
+				p_user_data,
+				1,
+				_p_args);
+
+		api->godot_variant_destroy(&filename);
+	}
+	struct archive *a;
+	struct archive *ext;
+	struct archive_entry *entry;
+	int flags;
+	int r;
+
+	a = self->a;
+
+	/* Select which attributes we want to restore. */
+	flags = ARCHIVE_EXTRACT_TIME;
+	flags |= ARCHIVE_EXTRACT_PERM;
+	flags |= ARCHIVE_EXTRACT_ACL;
+	flags |= ARCHIVE_EXTRACT_FFLAGS;
+
+	ext = archive_write_disk_new();
+	archive_write_disk_set_options(ext, flags);
+	archive_write_disk_set_standard_lookup(ext);
+
+	self->used = true;
+
+	for (;;) {
+		r = archive_read_next_header(a, &entry);
+
+		if (r == ARCHIVE_EOF)
+			break;
+
+		if (r < ARCHIVE_OK)
+			fprintf(stderr, "%s\n", archive_error_string(a));
+
+		if (r < ARCHIVE_WARN)
+			//exit(1);
+			break;
+
+		if (destination_len > 0) {
+			const char *filename = archive_entry_pathname(entry);
+
+			size_t filename_len = strlen(filename);
+
+			char *fullpath = api->godot_alloc(destination_len + filename_len + 1);
+
+			memset(fullpath, 0, strlen(destination) + 1);
+			memcpy(fullpath, destination, strlen(destination));
+			strcat(fullpath, filename);
+
+			printf("%s\n", fullpath);
+			archive_entry_set_pathname(entry, fullpath);
+
+			api->godot_free(fullpath);
+		}
+
+		r = archive_write_header(ext, entry);
+		if (r < ARCHIVE_OK)
+			fprintf(stderr, "%s\n", archive_error_string(ext));
+
+		else if (archive_entry_size(entry) > 0) {
+			r = _gdarchive_copy_data(a, ext);
+
+			if (r < ARCHIVE_OK)
+				fprintf(stderr, "%s\n", archive_error_string(ext));
+
+			if (r < ARCHIVE_WARN)
+				exit(1);
+		}
+
+		r = archive_write_finish_entry(ext);
+		if (r < ARCHIVE_OK)
+			fprintf(stderr, "%s\n", archive_error_string(ext));
+		if (r < ARCHIVE_WARN)
+			//exit(1);
+			break;
+	}
+	archive_write_close(ext);
+	archive_write_free(ext);
+
+	if (destination != NULL)
+		gdns_free(destination);
+
 	godot_variant ret;
 	godot_variant_new_int(&ret, 0);
 
@@ -361,4 +462,76 @@ void GDN_EXPORT godot_nativescript_init(void *p_handle) {
 	GDNS_REGISTER_METHOD(ARCHIVE, close, &gdarchive_close)
 	GDNS_REGISTER_METHOD(ARCHIVE, list, &gdarchive_list)
 	GDNS_REGISTER_METHOD(ARCHIVE, extract, &gdarchive_extract)
+}
+
+//  _   _      _                 _____
+// | | | | ___| |_ __   ___ _ __|  ___|   _ _ __   ___ ___
+// | |_| |/ _ \ | '_ \ / _ \ '__| |_ | | | | '_ \ / __/ __|
+// |  _  |  __/ | |_) |  __/ |  |  _|| |_| | | | | (__\__ \
+// |_| |_|\___|_| .__/ \___|_|  |_|   \__,_|_| |_|\___|___/
+//              |_|
+
+char *_gdarchive_path(char *p_path) {
+
+	size_t p_path_len = strlen(p_path);
+
+	if (memcmp(p_path, "user://", 7) == 0) {
+		godot_object *os;
+		godot_method_bind *mb;
+
+		os = api->godot_global_get_singleton((char *)"OS");
+		mb = api->godot_method_bind_get_method("_OS", "get_user_data_dir");
+
+		godot_string path;
+		godot_string_new(&path);
+		const void *args[1] = {};
+		api->godot_method_bind_ptrcall(mb, os, args, &path);
+
+		char *user_path = gdns_cstr_new_string(&path);
+		size_t user_path_len = strlen(user_path);
+
+		char *rem = p_path + 7;
+		size_t rem_len = strlen(p_path) - 7;
+
+		char *ret = api->godot_alloc(user_path_len + rem_len + 2);
+		memcpy(ret, user_path, user_path_len);
+
+		if (ret[user_path_len] != '/')
+			strcat(ret, "/"); // TODO: Keep Windows in mind!
+
+		strcat(ret, rem);
+
+		godot_string_destroy(&path);
+		gdns_free(user_path);
+
+		return ret;
+	}
+
+	char *ret = api->godot_alloc(p_path_len + 1);
+	memcpy(ret, p_path, p_path_len + 1);
+	return ret;
+}
+
+int _gdarchive_copy_data(struct archive *ar, struct archive *aw) {
+	int r;
+	const void *buff;
+	size_t size;
+	la_int64_t offset;
+
+	for (;;) {
+		r = archive_read_data_block(ar, &buff, &size, &offset);
+
+		if (r == ARCHIVE_EOF)
+			return (ARCHIVE_OK);
+
+		if (r < ARCHIVE_OK)
+			return (r);
+
+		r = archive_write_data_block(aw, buff, size, offset);
+
+		if (r < ARCHIVE_OK) {
+			fprintf(stderr, "%s\n", archive_error_string(aw));
+			return (r);
+		}
+	}
 }
