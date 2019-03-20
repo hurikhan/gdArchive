@@ -41,10 +41,10 @@ void gdarchive_destructor(GDNS_DESTRUCTOR_PARAM);
 
 godot_variant gdarchive_get_version(GDNS_PARAM);
 godot_variant gdarchive_get_info(GDNS_PARAM);
-godot_variant gdarchive_list(GDNS_PARAM);
 godot_variant gdarchive_open(GDNS_PARAM);
 godot_variant gdarchive_close(GDNS_PARAM);
-
+godot_variant gdarchive_list(GDNS_PARAM);
+godot_variant gdarchive_extract(GDNS_PARAM);
 //   ____ _
 //  / ___| | __ _ ___ ___
 // | |   | |/ _` / __/ __|
@@ -54,7 +54,8 @@ godot_variant gdarchive_close(GDNS_PARAM);
 typedef struct user_data_struct {
 	char filename[FILENAME_SIZE];
 	struct archive *a;
-	bool opened;
+	bool opened; // Archive is opened (successfully)
+	bool listed; // archive.list() was called
 } user_data_struct;
 
 void *gdarchive_constructor(GDNS_CONSTRUCTOR_PARAM) {
@@ -256,6 +257,33 @@ godot_variant gdarchive_list(GDNS_PARAM) {
 	user_data_struct *self;
 	self = p_user_data;
 
+	if (self->opened && self->listed) {
+		// archive is already opened(self->opened) and the
+		// archive_read_next_header() function was already called (self->listed).
+		//
+		// To get a fresh struct archive *a (self->a):
+		//   1. gdarchive_close() is called
+		//   2. gdarchive_open(filename) is called
+		//
+		godot_variant filename = gdns_variant_new_cstr(self->filename);
+		godot_variant *_p_args[1];
+		_p_args[0] = &filename;
+
+		godot_variant ret_close = gdarchive_close(p_instance,
+				NULL,
+				p_user_data,
+				0,
+				NULL);
+
+		godot_variant ret_open = gdarchive_open(p_instance,
+				NULL,
+				p_user_data,
+				1,
+				_p_args);
+
+		api->godot_variant_destroy(&filename);
+	}
+
 	struct archive_entry *entry;
 	godot_array arr;
 	godot_string s;
@@ -274,12 +302,20 @@ godot_variant gdarchive_list(GDNS_PARAM) {
 			api->godot_variant_destroy(&element);
 
 			archive_read_data_skip(self->a);
+			self->listed = true;
 		}
 	}
 
 	godot_variant ret;
 	godot_variant_new_array(&ret, &arr);
 	godot_array_destroy(&arr);
+
+	return ret;
+}
+
+godot_variant gdarchive_extract(GDNS_PARAM) {
+	godot_variant ret;
+	godot_variant_new_int(&ret, 0);
 
 	return ret;
 }
@@ -324,4 +360,5 @@ void GDN_EXPORT godot_nativescript_init(void *p_handle) {
 	GDNS_REGISTER_METHOD(ARCHIVE, open, &gdarchive_open)
 	GDNS_REGISTER_METHOD(ARCHIVE, close, &gdarchive_close)
 	GDNS_REGISTER_METHOD(ARCHIVE, list, &gdarchive_list)
+	GDNS_REGISTER_METHOD(ARCHIVE, extract, &gdarchive_extract)
 }
