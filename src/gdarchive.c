@@ -220,7 +220,6 @@ godot_variant gdarchive_close(GDNS_PARAM) {
 		int r = archive_read_free(self->a);
 
 		if (r == ARCHIVE_OK) {
-			self->opened = false;
 			api->godot_variant_new_bool(&ret, true);
 		} else {
 			gdns_print("[gdArchive] Archive could not be freed!");
@@ -229,6 +228,8 @@ godot_variant gdarchive_close(GDNS_PARAM) {
 	} else {
 		api->godot_variant_new_bool(&ret, false);
 	}
+	self->opened = false;
+	self->used = false;
 
 	memset(self->filename, 0, sizeof(self->filename));
 

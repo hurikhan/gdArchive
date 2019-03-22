@@ -15,8 +15,8 @@ OSX.64=""
 
 [dependencies]
 
-Server.64=[""]
-X11.64=[""]
+Server.64=["libarchive.so.16"]
+X11.64=["libarchive.so.16"]
 Windows.32=[""]
 Windows.64=[""]
 OSX.64=[""]
