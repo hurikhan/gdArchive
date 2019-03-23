@@ -6,6 +6,7 @@ func _init():
 	var archive = preload("addons/gdArchive/gdArchive.gdns").new()
 	var version = archive.get_version()
 
+	print(version)
 	test.assert_type(version, TYPE_STRING )
 	test.assert("begins with gdarchive", version.begins_with("gdarchive"))
 

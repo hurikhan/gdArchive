@@ -2,9 +2,6 @@
 
 Import('env')
 
-env['LIBDIR'] = "#/"
-env['CPPPATH'] = "#/src/godot_headers"
-env['LIBS'] = "archive"
 
 env.SharedLibrary('gdarchive', ['gdns.c', 'gdarchive.c'])
 

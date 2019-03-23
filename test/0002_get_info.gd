@@ -5,6 +5,7 @@ func _init():
 
 	var archive = preload("addons/gdArchive/gdArchive.gdns").new()
 	var info = archive.get_info()
+	print(info)
 
 	test.assert_type(info, TYPE_DICTIONARY)
 

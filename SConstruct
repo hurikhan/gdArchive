@@ -1,9 +1,18 @@
 #!/usr/bin/env python
 
+import os
+
 env = Environment()
 
 env['CC'] = "clang"
-env['CFLAGS'] = "-std=c11 -g -fcolor-diagnostics"
+env['CFLAGS'] = Split("-std=c11 -g -fcolor-diagnostics")
+env['CPPPATH'] = "#/src/godot_headers:#/src/thirdparty/libarchive/libarchive"
+env['LIBS'] = "archive"
+env['LIBPATH']=['#/src/thirdparty/libarchive/libarchive']
+
+env.Append( LINKFLAGS = Split('-z origin') )
+env.Append( RPATH = env.Literal(os.path.join('\\$$ORIGIN')))
+
 
 opts = Variables(None, ARGUMENTS)
 opts.Add("platform", "Target platform (linux)", "")
