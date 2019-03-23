@@ -15,6 +15,11 @@ cd bzip2-1.0.6
 make clean
 cd ..
 
+figlet lzma
+cd xz-5.2.4
+make clean
+cd ..
+
 figlet libarchive
 cd libarchive
 ninja clean

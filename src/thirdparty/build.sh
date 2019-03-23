@@ -54,21 +54,24 @@ make libbz2.a CFLAGS='-fPIC'
 
 cd ..
 
-#  _ _ _     _    ____  
-# | (_) |__ | |__|___ \ 
-# | | | '_ \| '_ \ __) |
-# | | | |_) | |_) / __/ 
-# |_|_|_.__/|_.__/_____|
-# 
-# figlet libb2
-# 
-# cd libb2
-# 
-# ./autogen.sh
-# ./configure
-# make
-# 
-# cd ..
+
+
+#  _                     
+# | |_____ __ ___   __ _ 
+# | |_  / '_ ` _ \ / _` |
+# | |/ /| | | | | | (_| |
+# |_/___|_| |_| |_|\__,_|
+
+figlet lzma
+
+cd xz-5.2.4
+
+./configure --enable-debug --disable-shared
+cd src/liblzma
+make CFLAGS=-fPIC
+
+cd ../../..
+
 
 
 #  _ _ _                    _     _           
