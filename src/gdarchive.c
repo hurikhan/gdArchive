@@ -417,8 +417,7 @@ godot_variant gdarchive_extract(GDNS_PARAM) {
 		gdns_free(destination);
 
 	godot_variant ret;
-	godot_variant_new_int(&ret, 0);
-
+	api->godot_variant_new_bool(&ret, true);
 	return ret;
 }
 
