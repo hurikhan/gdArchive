@@ -8,7 +8,9 @@ gdnative plugin for libarchive in pure C
 
 ## Clone
 ```bash
-  git clone --recurse-submodules https://github.com/hurikhan/gdArchive.git
+  git clone https://github.com/hurikhan/gdArchive.git
+  git submodule init
+  git submodule update
 ```
 
 ## Compile
