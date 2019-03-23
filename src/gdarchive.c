@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #define VERSION "0.0.1"
 #define VERSION_STRING "gdarchive 0.0.1"
@@ -240,6 +241,9 @@ godot_variant gdarchive_list(GDNS_PARAM) {
 	user_data_struct *self;
 	self = p_user_data;
 
+	// used for unicode support
+	char *old_locale = NULL;
+
 	if (self->opened && self->used) {
 		// archive is already opened(self->opened) and the
 		// archive_read_next_header() function was already called (self->used).
@@ -267,6 +271,10 @@ godot_variant gdarchive_list(GDNS_PARAM) {
 		api->godot_variant_destroy(&filename);
 	}
 
+	// unicode support
+	old_locale = setlocale(LC_ALL, NULL);
+	setlocale(LC_ALL, "");
+
 	struct archive_entry *entry;
 	godot_array arr;
 	godot_string s;
@@ -290,6 +298,9 @@ godot_variant gdarchive_list(GDNS_PARAM) {
 		}
 	}
 
+	if (old_locale != NULL)
+		setlocale(LC_ALL, old_locale);
+
 	godot_variant ret;
 	godot_variant_new_array(&ret, &arr);
 	godot_array_destroy(&arr);
@@ -305,6 +316,9 @@ godot_variant gdarchive_extract(GDNS_PARAM) {
 
 	char *destination = NULL;
 	size_t destination_len = 0;
+
+	// used for unicode support
+	char *old_locale = NULL;
 
 	// Eval p_args[0] -> destination
 	if (p_num_args == 1) {
@@ -346,6 +360,10 @@ godot_variant gdarchive_extract(GDNS_PARAM) {
 	int r;
 
 	a = self->a;
+
+	// unicode support
+	old_locale = setlocale(LC_ALL, NULL);
+	setlocale(LC_ALL, "");
 
 	/* Select which attributes we want to restore. */
 	flags = ARCHIVE_EXTRACT_TIME;
@@ -415,6 +433,9 @@ godot_variant gdarchive_extract(GDNS_PARAM) {
 
 	if (destination != NULL)
 		gdns_free(destination);
+
+	if (old_locale != NULL)
+		setlocale(LC_ALL, old_locale);
 
 	godot_variant ret;
 	api->godot_variant_new_bool(&ret, true);

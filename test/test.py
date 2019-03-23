@@ -17,7 +17,9 @@ tests = [
 	"0002_get_info.gd",
 	"0003_open_close.gd",
 	"0004_list.gd",
-	"0005_extract.gd"
+	"0005_extract.gd",
+	"0006_unicode_list.gd",
+	"0007_unicode_extract.gd",
 	]
 
 def _result(s1, s2):

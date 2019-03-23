@@ -35,10 +35,8 @@ func assert( desc, check ):
 		else:
 			print("  ", desc, " [FAILED]")
 			passed = false
-	
 
 	counter = counter + 1
-	print("--------------------------------------")
 
 func assert_type(value, type):
 
@@ -51,7 +49,6 @@ func assert_type(value, type):
 		passed = false
 	
 	counter = counter + 1
-	print("--------------------------------------")
 
 func done():
 	if counter > 0:
