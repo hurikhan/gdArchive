@@ -66,11 +66,11 @@ figlet lzma
 
 cd xz-5.2.4
 
+./autogen.sh
 ./configure --enable-debug --disable-shared
-cd src/liblzma
 make CFLAGS=-fPIC
 
-cd ../../..
+cd ..
 
 
 
