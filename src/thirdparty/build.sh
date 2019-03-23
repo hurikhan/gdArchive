@@ -107,7 +107,7 @@ cmake	-DZSTD_INCLUDE_DIR="$D/zstd/lib/" \
  	-DBZIP2_INCLUDE_DIR="$D/bzip2-1.0.6/" \
  	-DBZIP2_LIBRARY_DEBUG="$D/bzip2-1.0.6/libbz2.a" \
  	-DBZIP2_LIBRARY_RELEASE="$D/bzip2-1.0.6/libbz2.a" \
-	-DLIBLZMA_INCLUDE_DIR="$D/xz-5.2.4/src/liblzma/lzma/" \
+	-DLIBLZMA_INCLUDE_DIR="$D/xz-5.2.4/src/liblzma/api/" \
 	-DLIBLZMA_LIBRARY="$D/xz-5.2.4/src/liblzma/.libs/liblzma.a" \
  	-DENABLE_OPENSSL=false \
  	-G Ninja .
