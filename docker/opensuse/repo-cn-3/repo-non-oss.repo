@@ -1,0 +1,8 @@
+[repo-non-oss]
+name=CN-Non-Oss
+enabled=1
+autorefresh=1
+baseurl=http://mirrors.ustc.edu.cn/opensuse/distribution/openSUSE-current/repo/non-oss/
+path=/
+type=rpm-md
+keeppackages=0
