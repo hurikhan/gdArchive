@@ -9,6 +9,7 @@ rm build/cmake/.ninja_deps
 rm build/cmake/.ninja_log
 rm build/cmake/build.ninja
 rm build/cmake/rules.ninja
+rm build/cmake/CMakeCache.txt
 cd ..
 
 
@@ -101,4 +102,7 @@ rm .ninja_deps
 rm .ninja_log
 rm build.ninja
 rm rules.ninja
+rm CMakeCache.txt
 cd ..
+
+rm build.db

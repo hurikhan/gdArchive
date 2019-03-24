@@ -2,16 +2,12 @@
 
 Import('env')
 
+so = env.SharedLibrary('libgdarchive.so', ['gdns.c', 'gdarchive.c'])
+inst_so = env.Install("#addons/gdArchive", "#build/linux/libgdarchive.so")
+env.Depends(inst_so, so)
 
-env.SharedLibrary('gdarchive', ['gdns.c', 'gdarchive.c'])
-
-# options for debugging the scons environment
-if env['env_print'] != "":
-	ep = env['env_print']
-	print("--------------------------------------------------------")
-	if ep == "all":
-		for key,value in env.items():
-		    print(key, ": ", value)
-	else:
-		print(ep, ": ", env[ep])
-	print("--------------------------------------------------------")
+if env['builtin_libarchive']:
+	la = env.Command('addons/gdArchive/libarchive.so', '', './src/thirdparty/build.sh')
+	env.Depends(so, la)
+	inst_la = env.Install("#addons/gdArchive", "#src/thirdparty/libarchive.so")
+	env.Depends(inst_la, so)

@@ -8,16 +8,15 @@ env['CC'] = "clang"
 env['CFLAGS'] = Split("-std=c11 -g -fcolor-diagnostics")
 env['CPPPATH'] = "#/src/godot_headers:#/src/thirdparty/libarchive/libarchive"
 env['LIBS'] = "archive"
-env['LIBPATH']=['#/src/thirdparty/libarchive/libarchive']
+env['LIBPATH']=['#/src/thirdparty']
 
 env.Append( LINKFLAGS = Split('-z origin') )
 env.Append( RPATH = env.Literal(os.path.join('\\$$ORIGIN')))
 
-
 opts = Variables(None, ARGUMENTS)
 opts.Add("platform", "Target platform (linux)", "")
 opts.Add(BoolVariable("src_format", "Format source code in src/ with clang-format",False))
-opts.Add("env_print", "Prints the scons enviroment (all|key)", "")
+opts.Add(BoolVariable("builtin_libarchive", "Use the libarchive built-in library",False))
 opts.Update(env)
 Help(opts.GenerateHelpText(env))
 
@@ -28,4 +27,5 @@ if env['src_format']:
 if env['platform'] == "linux":
 	Export('env')
 	env.SConscript('src/SConscript', variant_dir='build/$platform', duplicate=0)
-	env.Install("#addons/gdArchive", "#build/linux/libgdarchive.so")
+
+
