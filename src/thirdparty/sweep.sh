@@ -12,11 +12,6 @@ echo ======================================================================
 figlet sweep.sh
 echo ======================================================================
 
-if [ ! -f sweep.sh ]; then
-	echo "sweep.sh: cannot find sweep.sh in the current directory!"
-	exit $_ERR_CANNOT_FIND_CLEAN_SH
-fi
-
 if [ $1 ]; then
 	cd $1
 
@@ -25,6 +20,12 @@ if [ $1 ]; then
 		exit $_ERR_CANNOT_CHANGE_TO_DIR
 	fi
 fi
+
+if [ ! -f sweep.sh ]; then
+	echo "sweep.sh: cannot find sweep.sh in the current directory!"
+	exit $_ERR_CANNOT_FIND_CLEAN_SH
+fi
+
 
 grep "^# Filename: src/thirdparty/sweep.sh" sweep.sh > /dev/null
 if [ $? != 0 ]; then

@@ -12,11 +12,6 @@ echo ======================================================================
 figlet clean.sh
 echo ======================================================================
 
-if [ ! -f clean.sh ]; then
-	echo "clean.sh: cannot find clean.sh in the current directory!"
-	exit $_ERR_CANNOT_FIND_CLEAN_SH
-fi
-
 if [ $1 ]; then
 	cd $1
 
@@ -25,6 +20,12 @@ if [ $1 ]; then
 		exit $_ERR_CANNOT_CHANGE_TO_DIR
 	fi
 fi
+
+if [ ! -f clean.sh ]; then
+	echo "clean.sh: cannot find clean.sh in the current directory!"
+	exit $_ERR_CANNOT_FIND_CLEAN_SH
+fi
+
 
 grep "^# Filename: src/thirdparty/clean.sh" clean.sh > /dev/null
 if [ $? != 0 ]; then
@@ -47,6 +48,6 @@ do
 	cd ..
 done
 
-rm build/libarchive.so.16
+rm -f build/libarchive.so.16
 
 exit 0

@@ -9,6 +9,18 @@ env['CFLAGS'] = Split('-std=c11 -g -fcolor-diagnostics')
 env['CPPPATH'] = '#/src/godot_headers'
 env['LIBS'] = 'archive'
 
+def thirdparty_sweep():
+	import subprocess
+	sweep_script_dir = str(Dir('#/src/thirdparty/'))
+	sweep_script =  sweep_script_dir + '/sweep.sh'
+	subprocess.run([sweep_script, sweep_script_dir])
+
+def thirdparty_clean():
+	import subprocess
+	clean_script_dir = str(Dir('#/src/thirdparty/'))
+	clean_script =  clean_script_dir + '/clean.sh'
+	subprocess.run([clean_script, clean_script_dir])
+
 def thirdparty_copy(source, target, env):
 	src = 'src/thirdparty/build/libarchive.so.16' # TODO: eval target[0] to set src
 	#Execute(Copy('build/linux/libarchive.so.16', 'src/thirdparty/build/libarchive.so.16'))
@@ -29,6 +41,13 @@ if env['builtin']:
 
 	inst_la = env.Install('#addons/gdArchive', 'libarchive.so.16')
 	env.Depends(inst_la, so)
+
+	if env.GetOption('clean'):
+		if env['builtin_sweep']:
+			thirdparty_sweep()
+		else:
+			thirdparty_clean()
+
 
 else:
 	so = env.SharedLibrary('libgdarchive.so', ['gdns.c', 'gdarchive.c'])
