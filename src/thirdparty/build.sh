@@ -1,6 +1,10 @@
 #! /usr/bin/env bash
 
 
+echo ======================================================================
+figlet build.sh
+echo ======================================================================
+
 # if the build.sh script is invoked by scons
 #   changedir to the src/thirdparty directory
 if [ $0 == "./src/thirdparty/build.sh" ]; then
@@ -173,9 +177,36 @@ fi
 # build
 ninja archive
 
+
+#  _ _     _ 
+# | | | __| |
+# | | |/ _` |
+# | | | (_| |
+# |_|_|\__,_|
+
 figlet ldd
 ldd -v libarchive/libarchive.so
-
-cp libarchive/libarchive.so.16 ../libarchive.so
-
 cd ..
+
+
+#   ___ ___  _ __  _   _ 
+#  / __/ _ \| '_ \| | | |
+# | (_| (_) | |_) | |_| |
+#  \___\___/| .__/ \__, |
+#           |_|    |___/ 
+
+figlet copy
+
+if [ -z $2 ]; then
+	mkdir -p build
+	cp libarchive/libarchive/libarchive.so.16 build/libarchive.64.so
+else
+	if [ $2 == "linux" ]; then
+		mkdir -p build
+		cp libarchive/libarchive/libarchive.so.16 build/libarchive.64.so
+	fi
+fi
+
+echo 
+echo COPY Library to:  build/libarchive.64.so
+echo 
