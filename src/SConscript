@@ -1,13 +1,37 @@
 #!/usr/bin/env python
 
+import os
+
 Import('env')
 
-so = env.SharedLibrary('libgdarchive.so', ['gdns.c', 'gdarchive.c'])
-inst_so = env.Install("#addons/gdArchive", "#build/linux/libgdarchive.so")
-env.Depends(inst_so, so)
+env['CC'] = 'clang'
+env['CFLAGS'] = Split('-std=c11 -g -fcolor-diagnostics')
+env['CPPPATH'] = '#/src/godot_headers'
+env['LIBS'] = 'archive'
 
-if env['builtin_libarchive']:
-	la = env.Command('addons/gdArchive/libarchive.so', '', './src/thirdparty/build.sh')
+def thirdparty_copy(source, target, env):
+	src = 'src/thirdparty/build/libarchive.so.16' # TODO: eval target[0] to set src
+	#Execute(Copy('build/linux/libarchive.so.16', 'src/thirdparty/build/libarchive.so.16'))
+	Execute(Copy(target[0], src))
+
+if env['builtin']:
+	env['CPPPATH'] = '#/src/godot_headers:#/src/thirdparty/libarchive/libarchive'
+	env['LIBPATH']=['#/build/linux']
+	env['LIBS'] = [":libarchive.so.16"]
+
+	env.Append( LINKFLAGS = Split('-z origin') )
+	env.Append( RPATH = env.Literal(os.path.join('\\$$ORIGIN')))
+
+	so = env.SharedLibrary('libgdarchive.so', ['gdns.c', 'gdarchive.c'])
+
+	la = env.Command('libarchive.so.16', '', ['./src/thirdparty/build.sh', thirdparty_copy])
 	env.Depends(so, la)
-	inst_la = env.Install("#addons/gdArchive", "#src/thirdparty/libarchive.so")
+
+	inst_la = env.Install('#addons/gdArchive', 'libarchive.so.16')
 	env.Depends(inst_la, so)
+
+else:
+	so = env.SharedLibrary('libgdarchive.so', ['gdns.c', 'gdarchive.c'])
+
+inst_so = env.Install('#addons/gdArchive', '#build/linux/libgdarchive.so')
+env.Depends(inst_so, so)

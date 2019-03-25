@@ -47,6 +47,6 @@ do
 	cd ..
 done
 
-rm build/libarchive.64.so
+rm build/libarchive.so.16
 
 exit 0

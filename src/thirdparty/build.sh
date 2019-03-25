@@ -14,14 +14,6 @@ else
 	export CXX=/usr/bin/clang++
 fi
 
-# ----------------------
-
-#if [ -f libarchive/libarchive/libarchive.so ]; then
-#	exit 0
-#fi
-
-# ----------------------
-
 _MSG_ALREADY_CONF="build.sh: already configured."
 
 function is_configured {
@@ -199,14 +191,14 @@ figlet copy
 
 if [ -z $2 ]; then
 	mkdir -p build
-	cp libarchive/libarchive/libarchive.so.16 build/libarchive.64.so
+	cp libarchive/libarchive/libarchive.so.16 build/libarchive.so.16
 else
 	if [ $2 == "linux" ]; then
 		mkdir -p build
-		cp libarchive/libarchive/libarchive.so.16 build/libarchive.64.so
+		cp libarchive/libarchive/libarchive.so.16 build/libarchive.so.16
 	fi
 fi
 
 echo 
-echo COPY Library to:  build/libarchive.64.so
-echo 
+echo COPY Library to:  build/libarchive.so.16
+echo 	
