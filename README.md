@@ -51,8 +51,9 @@ gdnative plugin for libarchive in pure C
 - [x] Extract files from archive
 - [x] UTF-8 support
 - [x] Complete manual invoked tests/ for the current API
+- [x] Builtin libarchive sources + scons workflow
 - [ ] Create Docker-Container for libgdarchive.so + libarchive.so compilation
-- [ ] Bundle gdArchive with libarchive.so
+
 ### Version 0.2.0
 - [ ] Nativescript 1.1 support
 - [ ] Supported platforms: linux, windows
