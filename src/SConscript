@@ -39,7 +39,7 @@ if env['builtin']:
 	la = env.Command('libarchive.so.16', '', ['./src/thirdparty/build.sh', thirdparty_copy])
 	env.Depends(so, la)
 
-	inst_la = env.Install('#addons/gdArchive', 'libarchive.so.16')
+	inst_la = env.Install('#addons/gdarchive', 'libarchive.so.16')
 	env.Depends(inst_la, so)
 
 	if env.GetOption('clean'):
@@ -52,5 +52,5 @@ if env['builtin']:
 else:
 	so = env.SharedLibrary('libgdarchive.so', ['gdns.c', 'gdarchive.c'])
 
-inst_so = env.Install('#addons/gdArchive', '#build/linux/libgdarchive.so')
+inst_so = env.Install('#addons/gdarchive', '#build/linux/libgdarchive.so')
 env.Depends(inst_so, so)

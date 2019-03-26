@@ -3,7 +3,7 @@ extends SceneTree
 func _init():
 	var test = preload("test.gd").new()
 
-	var archive = preload("addons/gdArchive/gdArchive.gdns").new()
+	var archive = preload("addons/gdarchive/gdarchive.gdns").new()
 	var version = archive.get_version()
 
 	print(version)

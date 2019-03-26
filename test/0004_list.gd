@@ -3,7 +3,7 @@ extends SceneTree
 func _init():
 	var test = preload("test.gd").new()
 
-	var archive = preload("addons/gdArchive/gdArchive.gdns").new()
+	var archive = preload("addons/gdarchive/gdarchive.gdns").new()
 
 	test.assert("Open without filename", !archive.open())
 	test.assert("Open with wrong path", !archive.open("../data/test.tar.gzip"))

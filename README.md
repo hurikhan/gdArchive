@@ -31,7 +31,7 @@ gdnative plugin for libarchive in pure C
 
 ## Usage
 ```gdscript
-  var archive = preload("res://addons/gdArchive/gdArchive.gdns").new()
+  var archive = preload("res://addons/gdarchive/gdarchive.gdns").new()
 
 	print(archive.get_version())
 	print(archive.get_info())

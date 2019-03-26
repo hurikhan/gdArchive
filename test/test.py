@@ -7,7 +7,7 @@ from sys import argv
 import toml
 
 
-copy_tree("../addons/gdArchive/", "./addons/gdArchive/")
+copy_tree("../addons/gdarchive/", "./addons/gdarchive/")
 
 config = toml.load("test.toml")
 godot = config['godot']['Server']['64']
