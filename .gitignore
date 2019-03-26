@@ -4,3 +4,4 @@ build
 addons/gdArchive/libgdarchive.so
 addons/gdArchive/libarchive.so.16
 test/addons
+docker/opensuse/cache
