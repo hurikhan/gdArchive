@@ -21,6 +21,7 @@ function _env {
 
 function _image_create {
 	echo "Creating Docker gdarchive image..."
+	mkdir -p worker/opensuse/cache
 	docker build -t $_IMAGE_NAME .
 	_run cache
 }
