@@ -9,7 +9,7 @@ func _init():
 	test.assert("Open with wrong path", !archive.open("../data/test.tar.gzip"))
 	test.assert("Open with wrong path", !archive.open("../data/test.tar.bz2"))
 	test.assert("Open with wrong path", !archive.open("../data/test.tar.xz"))
-	test.assert("Open with wrong path", !archive.open("../data/test.tar.zst"))
+	# test.assert("Open with wrong path", !archive.open("../data/test.tar.zst"))
 
 	var f = File.new()
 	f.open("res://test.gd", 1)
@@ -31,9 +31,9 @@ func _init():
 	test.assert("Open " + a, archive.open(res_path + a))
 	test.assert("Close " + a, archive.close())
 
-	a = "/data/test_0001.tar.zst"	
-	test.assert("Open " + a, archive.open(res_path + a))
-	test.assert("Close " + a, archive.close())
+	# a = "/data/test_0001.tar.zst"	
+	# test.assert("Open " + a, archive.open(res_path + a))
+	# test.assert("Close " + a, archive.close())
 
 	test.assert("Close without open", !archive.close())
 

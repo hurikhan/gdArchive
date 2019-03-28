@@ -57,6 +57,9 @@ gdnative plugin for libarchive in pure C
 ### Version 0.2.0
 - [ ] Nativescript 1.1 support
 - [ ] Supported platforms: linux, windows
+- [ ] Support for zstd compression
 - [ ] Invoke test/test.py with scons
+
 ### Version 0.3.0
 - [ ] Define final API (Version 1.0.0)
+

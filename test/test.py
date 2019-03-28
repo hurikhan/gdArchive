@@ -37,7 +37,7 @@ def _result(s1, s2):
 for test in tests:
 	try:
 		ret = ""
-		ret = check_output([godot, "--script", test ], stderr=STDOUT, timeout=5)
+		ret = check_output([godot, "--script", test ], stderr=STDOUT, timeout=60)
 		ret = ret.decode("utf-8")
 
 		if ret.endswith("\n[TEST OK]\n"):
